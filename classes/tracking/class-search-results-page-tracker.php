@@ -1,7 +1,7 @@
 <?php
-// Ensure that the file cannot be accessed directly
+
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit;
 }
 
 class Search_Results_Page_Tracker {
