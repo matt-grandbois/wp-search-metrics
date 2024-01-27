@@ -25,17 +25,17 @@ class Ajax_Search_Tracker {
 	
 	// Initialize WordPress hooks here.
     private function init_hooks() {
-        add_action('wp_ajax_bbm_search_metrics_log_search_interaction', array($this, 'log_ajax_search_interaction'));
-        add_action('wp_ajax_nopriv_bbm_search_metrics_log_search_interaction', array($this, 'log_ajax_search_interaction'));
+        add_action('wp_ajax_wp_search_metrics_log_search_interaction', array($this, 'log_ajax_search_interaction'));
+        add_action('wp_ajax_nopriv_wp_search_metrics_log_search_interaction', array($this, 'log_ajax_search_interaction'));
 
-        add_action('wp_ajax_bbm_search_metrics_log_no_results', array($this, 'log_ajax_search_no_results'));
-        add_action('wp_ajax_nopriv_bbm_search_metrics_log_no_results', array($this, 'log_ajax_search_no_results'));
+        add_action('wp_ajax_wp_search_metrics_log_no_results', array($this, 'log_ajax_search_no_results'));
+        add_action('wp_ajax_nopriv_wp_search_metrics_log_no_results', array($this, 'log_ajax_search_no_results'));
     }
 	
 	public function log_ajax_search_interaction() {
 		global $wpdb;
 		// check security of nonce
-		check_ajax_referer('bbm_search_metrics_nonce', 'nonce');  // Security check
+		check_ajax_referer('wp_search_metrics_nonce', 'nonce');  // Security check
 
 		// Extract and sanitize the data from the AJAX request
 		$search_query  = sanitize_text_field($_POST['search_query']);
@@ -45,7 +45,7 @@ class Ajax_Search_Tracker {
 		// Check if query already exists in the queries table
 		$query_id = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
+				"SELECT id FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
 				$search_query
 			)
 		);
@@ -53,7 +53,7 @@ class Ajax_Search_Tracker {
 		if(!$query_id) {
 			// Insert new search query if it does not exist
 			$wpdb->insert(
-				BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
+				WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
 				array('query_text' => $search_query, 'query_count' => 1),
 				array('%s', '%d')
 			);
@@ -62,7 +62,7 @@ class Ajax_Search_Tracker {
 			// Increment query count if it already exists
 			$wpdb->query(
 				$wpdb->prepare(
-					"UPDATE " . BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " SET query_count = query_count + 1, last_searched = NOW() WHERE id = %d",
+					"UPDATE " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " SET query_count = query_count + 1, last_searched = NOW() WHERE id = %d",
 					$query_id
 				)
 			);
@@ -71,7 +71,7 @@ class Ajax_Search_Tracker {
 		// Check if post interaction already exists in the post_interactions table
 		$post_interaction_exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " WHERE post_id = %d LIMIT 1",
+				"SELECT id FROM " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " WHERE post_id = %d LIMIT 1",
 				$post_id
 			)
 		);
@@ -79,7 +79,7 @@ class Ajax_Search_Tracker {
 		if(!$post_interaction_exists) {
 			// Insert new post interaction if it does not exist
 			$wpdb->insert(
-				BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE,
+				WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE,
 				array('post_id' => $post_id, 'click_count' => 1),
 				array('%d', '%d')
 			);
@@ -87,7 +87,7 @@ class Ajax_Search_Tracker {
 			// Increment click count if it already exists
 			$wpdb->query(
 				$wpdb->prepare(
-					"UPDATE " . BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " SET click_count = click_count + 1, last_clicked = NOW() WHERE post_id = %d",
+					"UPDATE " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " SET click_count = click_count + 1, last_clicked = NOW() WHERE post_id = %d",
 					$post_id
 				)
 			);
@@ -95,7 +95,7 @@ class Ajax_Search_Tracker {
 
 		// Log search interactions with post
 		$wpdb->insert(
-			BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE,
+			WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE,
 			array(
 				'query_id' => $query_id,
 				'post_id' => $post_id,
@@ -111,7 +111,7 @@ class Ajax_Search_Tracker {
 	function log_ajax_search_no_results() {
 		global $wpdb;
 		// check security of nonce
-		check_ajax_referer('bbm_search_metrics_nonce', 'nonce');  // Security check
+		check_ajax_referer('wp_search_metrics_nonce', 'nonce');  // Security check
 
 		// Extract and sanitize the data from the AJAX request
 		$search_query  = sanitize_text_field($_POST['search_query']);
@@ -120,7 +120,7 @@ class Ajax_Search_Tracker {
 		// Check if query already exists in the queries table
 		$query_id = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
+				"SELECT id FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
 				$search_query
 			)
 		);
@@ -128,7 +128,7 @@ class Ajax_Search_Tracker {
 		if(!$query_id) {
 			// Insert new search query if it does not exist
 			$wpdb->insert(
-				BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
+				WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
 				array('query_text' => $search_query, 'query_count' => 1),
 				array('%s', '%d')
 			);
@@ -137,7 +137,7 @@ class Ajax_Search_Tracker {
 			// Increment query count if it already exists
 			$wpdb->query(
 				$wpdb->prepare(
-					"UPDATE " . BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
+					"UPDATE " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
 					 SET query_count = query_count + 1, last_searched = NOW()
 					 WHERE id = %d",
 					$query_id
@@ -147,7 +147,7 @@ class Ajax_Search_Tracker {
 
 		// Log the "no results" interaction
 		$wpdb->insert(
-			BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE,
+			WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE,
 			array(
 				'query_id' => $query_id,
 				// Making sure to use `null` to signify no post was clicked

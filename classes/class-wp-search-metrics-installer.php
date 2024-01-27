@@ -1,10 +1,10 @@
 <?php
 
-if ( ! class_exists( 'BBM_Search_Metrics_Installer' ) ) {
+if ( ! class_exists( 'WP_Search_Metrics_Installer' ) ) {
 
-    class BBM_Search_Metrics_Installer {
+    class WP_Search_Metrics_Installer {
 
-        const OPTION_NAME = 'bbm_search_metrics_remove_data';
+        const OPTION_NAME = 'wp_search_metrics_remove_data';
 
         public static function activate() {
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -23,9 +23,9 @@ if ( ! class_exists( 'BBM_Search_Metrics_Installer' ) ) {
             global $wpdb;
             $charset_collate = $wpdb->get_charset_collate();
 
-            $search_queries_table = BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE;
-            $search_interactions_table = BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE;
-            $post_interactions_table = BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE;
+            $search_queries_table = WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE;
+            $search_interactions_table = WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE;
+            $post_interactions_table = WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE;
 
             $search_queries_sql = "CREATE TABLE {$search_queries_table} (
                 id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -61,9 +61,9 @@ if ( ! class_exists( 'BBM_Search_Metrics_Installer' ) ) {
         private static function remove_tables() {
             global $wpdb;
 
-            $search_queries_table = BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE;
-            $search_interactions_table = BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE;
-            $post_interactions_table = BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE;
+            $search_queries_table = WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE;
+            $search_interactions_table = WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE;
+            $post_interactions_table = WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE;
 
             $wpdb->query( "DROP TABLE IF EXISTS {$search_interactions_table}" );
             $wpdb->query( "DROP TABLE IF EXISTS {$search_queries_table}" );

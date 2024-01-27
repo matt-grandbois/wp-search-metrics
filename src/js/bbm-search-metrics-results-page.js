@@ -1,5 +1,5 @@
 (function($) {
-	var searchQuery = bbmSearchMetricsResultsPage.current_search_query.toLowerCase();
+	var searchQuery = wpSearchMetricsResultsPage.current_search_query.toLowerCase();
 	var searchInteractionLogged = false; // Flag to ensure interaction is logged only once
 
 	// Function to handle interaction logging
@@ -11,11 +11,11 @@
 		postId = postId || null;
 
 		$.ajax({
-			url: bbmSearchMetricsResultsPage.ajax_url,
+			url: wpSearchMetricsResultsPage.ajax_url,
 			type: 'POST',
 			data: {
-				action: 'bbm_search_metrics_log_search_interaction_results_page',
-				nonce: bbmSearchMetricsResultsPage.nonce,
+				action: 'wp_search_metrics_log_search_interaction_results_page',
+				nonce: wpSearchMetricsResultsPage.nonce,
 				search_query: searchQuery,
 				post_id: postId,
 				event_type: eventType
@@ -36,12 +36,12 @@
 	}
 
 	// Track clicks on search results
-	$('[data-bbm-search-metrics-results-page-post-id]').on('click', function(event) {
+	$('[data-wp-search-metrics-results-page-post-id]').on('click', function(event) {
 		event.preventDefault(); // Prevent default click event
 
 		var clickedElement = $(this);
 		var targetUrl = clickedElement.attr('href');
-		var postId = clickedElement.data('bbm-search-metrics-results-page-post-id');
+		var postId = clickedElement.data('wp-search-metrics-results-page-post-id');
 
 		trackSearchInteraction(searchQuery, postId, 'conversion', targetUrl);
 	});

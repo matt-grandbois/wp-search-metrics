@@ -1,41 +1,41 @@
 <?php
 
-class BBM_Search_Metrics_Admin_Dashboard {
+class WP_Search_Metrics_Admin_Dashboard {
 	
 	private $dashboard_page_hook_suffix;
 
     // Constructor
     public function __construct() {
-        add_action('admin_menu', array($this, 'bbm_search_metrics_add_menus'));
+        add_action('admin_menu', array($this, 'wp_search_metrics_add_menus'));
     }
     
-    public function bbm_search_metrics_add_menus() {
+    public function wp_search_metrics_add_menus() {
         $this->dashboard_page_hook_suffix = add_menu_page(
-            __('BBM Search Metrics', 'bbm-search-metrics'),
-            __('Search Metrics', 'bbm-search-metrics'),
+            __('WP Search Metrics', 'wp-search-metrics'),
+            __('Search Metrics', 'wp-search-metrics'),
             'manage_options',
-            'bbm-search-metrics',
-            array($this, 'bbm_search_metrics_dashboard_page'),
+            'wp-search-metrics',
+            array($this, 'wp_search_metrics_dashboard_page'),
             'dashicons-search',
             5
         );
 
-        add_action('admin_enqueue_scripts', array($this, 'bbm_search_metrics_enqueue_admin_scripts'));
+        add_action('admin_enqueue_scripts', array($this, 'wp_search_metrics_enqueue_admin_scripts'));
     }
 
-    public function bbm_search_metrics_dashboard_page() {
+    public function wp_search_metrics_dashboard_page() {
         global $wpdb;
         
         // Query to get the Total Searches (the sum of query_count for all queries)
-        $total_searches = $wpdb->get_var("SELECT COUNT(*) FROM " . BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE );
+        $total_searches = $wpdb->get_var("SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE );
 
         // Query to get the total number of unique search queries
-        $total_search_queries = $wpdb->get_var("SELECT COUNT(*) FROM " . BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE );
+        $total_search_queries = $wpdb->get_var("SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE );
 
         // Query to get the total number of clicks from searches
-        $total_search_clicks = $wpdb->get_var("SELECT COUNT(*) FROM " . BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " WHERE post_id IS NOT NULL AND interaction_type='conversion'" );
+        $total_search_clicks = $wpdb->get_var("SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " WHERE post_id IS NOT NULL AND interaction_type='conversion'" );
 		
-		$total_no_results_searches = $wpdb->get_var("SELECT COUNT(*) FROM " . BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " WHERE post_id IS NULL AND interaction_type='no_conversion'" );
+		$total_no_results_searches = $wpdb->get_var("SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " WHERE post_id IS NULL AND interaction_type='no_conversion'" );
 
         // Calculate the Search Conversion Rate
         $search_conversion_rate = $total_searches > 0 ? ($total_search_clicks / $total_searches) * 100 : 0;
@@ -47,7 +47,7 @@ class BBM_Search_Metrics_Admin_Dashboard {
 				<canvas id="myChart"></canvas>
 			</div>
             
-            <div class="bbm-search-metrics-stats">
+            <div class="wp-search-metrics-stats">
                 <p><strong>Total Searches: </strong><?php echo absint($total_searches); ?></p>
                 <p><strong>Total Number of Search Queries: </strong><?php echo absint($total_search_queries); ?></p>
                 <p><strong>Total Number of Clicks from Searches: </strong><?php echo absint($total_search_clicks); ?></p>
@@ -66,7 +66,7 @@ class BBM_Search_Metrics_Admin_Dashboard {
                 </thead>
                 <tbody>
                     <?php
-                    $search_queries_table = $wpdb->prefix . 'bbm_search_metrics_search_queries';
+                    $search_queries_table = $wpdb->prefix . 'wp_search_metrics_search_queries';
                     $search_queries = $wpdb->get_results( "SELECT query_text, query_count, last_searched FROM {$search_queries_table}" );
                     foreach ( $search_queries as $query ) {
                         echo '<tr>';
@@ -91,7 +91,7 @@ class BBM_Search_Metrics_Admin_Dashboard {
                 </thead>
                 <tbody>
                     <?php
-                    $post_interactions_table = $wpdb->prefix . 'bbm_search_metrics_post_interactions';
+                    $post_interactions_table = $wpdb->prefix . 'wp_search_metrics_post_interactions';
                     $post_interactions = $wpdb->get_results( "SELECT post_id, click_count, last_clicked FROM {$post_interactions_table}" );
                     foreach ( $post_interactions as $interaction ) {
                         $post_title = get_the_title( $interaction->post_id );
@@ -118,9 +118,9 @@ class BBM_Search_Metrics_Admin_Dashboard {
             </thead>
             <tbody>
                 <?php
-                    $search_queries_table = $wpdb->prefix . 'bbm_search_metrics_search_queries';
-                    $search_interactions_table = $wpdb->prefix . 'bbm_search_metrics_search_interactions';
-                    $post_interactions_table = $wpdb->prefix . 'bbm_search_metrics_post_interactions';
+                    $search_queries_table = $wpdb->prefix . 'wp_search_metrics_search_queries';
+                    $search_interactions_table = $wpdb->prefix . 'wp_search_metrics_search_interactions';
+                    $post_interactions_table = $wpdb->prefix . 'wp_search_metrics_post_interactions';
         
                     // Initial query to get each search query with how many different pages it is associated with
                     $query_counts = $wpdb->get_results("
@@ -186,8 +186,8 @@ class BBM_Search_Metrics_Admin_Dashboard {
             </thead>
             <tbody>
                 <?php
-                    $search_queries_table = $wpdb->prefix . 'bbm_search_metrics_search_queries';
-                    $search_interactions_table = $wpdb->prefix . 'bbm_search_metrics_search_interactions';
+                    $search_queries_table = $wpdb->prefix . 'wp_search_metrics_search_queries';
+                    $search_interactions_table = $wpdb->prefix . 'wp_search_metrics_search_interactions';
 
                     // SQL query to get the no result search queries
                     $no_result_queries = $wpdb->get_results("
@@ -246,10 +246,10 @@ class BBM_Search_Metrics_Admin_Dashboard {
         <?php
     }
 	
-	public function bbm_search_metrics_enqueue_admin_scripts($hook_suffix) {
+	public function wp_search_metrics_enqueue_admin_scripts($hook_suffix) {
         if ($hook_suffix === $this->dashboard_page_hook_suffix) {
 			wp_enqueue_style(
-				'bbm-search-metrics-css', // Handle for the stylesheet.
+				'wp-search-metrics-css', // Handle for the stylesheet.
 				plugins_url('/src/css/admin/dashboard.css', dirname(dirname(__FILE__))),// Path to the stylesheet file.
 				array(),                  // Dependencies (if any).
 				'1.0',                    // Version number.
@@ -257,7 +257,7 @@ class BBM_Search_Metrics_Admin_Dashboard {
 			);
 			
             wp_enqueue_script(
-                'bbm-search-metrics-chartjs',
+                'wp-search-metrics-chartjs',
                 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
                 array(), // Dependencies, if any
                 '4.4.1', // Version number
@@ -268,13 +268,13 @@ class BBM_Search_Metrics_Admin_Dashboard {
 			
 			// Query to get the total number of clicks from searches
         	$total_search_clicks = $wpdb->get_var(
-				"SELECT COUNT(*) FROM " . BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . "
+				"SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . "
 				WHERE post_id IS NOT NULL
 				AND interaction_type='conversion'"
 			);
 		
 			$total_no_results_searches = $wpdb->get_var(
-				"SELECT COUNT(*) FROM " . BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . "
+				"SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . "
 				WHERE post_id IS NULL
 				AND interaction_type='no_conversion'"
 			);
@@ -324,7 +324,7 @@ class BBM_Search_Metrics_Admin_Dashboard {
 			});
 			";
 
-			wp_add_inline_script('bbm-search-metrics-chartjs', $inline_script);
+			wp_add_inline_script('wp-search-metrics-chartjs', $inline_script);
         }
     }
 }

@@ -26,8 +26,8 @@ class Search_Results_Page_Tracker {
 	// Initialize WordPress hooks
 	private function init_hooks() {
         add_action('wp_enqueue_scripts', array($this, 'search_results_tracking_localize'));
-        add_action('wp_ajax_bbm_search_metrics_log_search_interaction_results_page', array($this, 'log_search_interaction'));
-        add_action('wp_ajax_nopriv_bbm_search_metrics_log_search_interaction_results_page', array($this, 'log_search_interaction'));
+        add_action('wp_ajax_wp_search_metrics_log_search_interaction_results_page', array($this, 'log_search_interaction'));
+        add_action('wp_ajax_nopriv_wp_search_metrics_log_search_interaction_results_page', array($this, 'log_search_interaction'));
     }
     
     public function search_results_tracking_localize() {
@@ -35,12 +35,12 @@ class Search_Results_Page_Tracker {
             $search_query = get_search_query();
             $current_search_query = !empty($search_query) ? esc_html($search_query) : '';
 
-            wp_enqueue_script('bbm-search-metrics-results-page-js', $this->plugin_url . 'src/js/bbm-search-metrics-results-page.js', array('jquery'), '1.0', true);
-            wp_localize_script('bbm-search-metrics-results-page-js', 'bbmSearchMetricsResultsPage', array(
+            wp_enqueue_script('wp-search-metrics-results-page-js', $this->plugin_url . 'src/js/wp-search-metrics-results-page.js', array('jquery'), '1.0', true);
+            wp_localize_script('wp-search-metrics-results-page-js', 'wpSearchMetricsResultsPage', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'is_search_results_page' => true,
                 'current_search_query' => $current_search_query,
-                'nonce' => wp_create_nonce('bbm_search_metrics_results_page_nonce'),
+                'nonce' => wp_create_nonce('wp_search_metrics_results_page_nonce'),
             ));
         }
     }
@@ -52,7 +52,7 @@ class Search_Results_Page_Tracker {
 		$current_datetime = gmdate('Y-m-d H:i:s');
 
 		// Perform the security check
-		check_ajax_referer('bbm_search_metrics_results_page_nonce', 'nonce');
+		check_ajax_referer('wp_search_metrics_results_page_nonce', 'nonce');
 
 		// Get POST variables safely
 		$search_query = sanitize_text_field($_POST['search_query']);
@@ -62,7 +62,7 @@ class Search_Results_Page_Tracker {
 		// First, check if search query exists and get its ID
 		$search_query_id = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
+				"SELECT id FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
 				$search_query
 			)
 		);
@@ -70,7 +70,7 @@ class Search_Results_Page_Tracker {
 		if (!$search_query_id) {
 			// Insert new search query if it does not exist
 			$wpdb->insert(
-				BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
+				WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
 				array('query_text' => $search_query, 'query_count' => 1),
 				array('%s', '%d')
 			);
@@ -79,7 +79,7 @@ class Search_Results_Page_Tracker {
 			// Increment query count if it already exists
 			$wpdb->query(
 				$wpdb->prepare(
-					"UPDATE " . BBM_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
+					"UPDATE " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
 					 SET query_count = query_count + 1, last_searched = %s
 					 WHERE id = %d",
 					$current_datetime,
@@ -92,7 +92,7 @@ class Search_Results_Page_Tracker {
 		if ($event_type === 'conversion') {
 			$post_interaction_row = $wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT * FROM " . BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " WHERE post_id = %d",
+					"SELECT * FROM " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " WHERE post_id = %d",
 					$post_id
 				)
 			);
@@ -100,7 +100,7 @@ class Search_Results_Page_Tracker {
 			if (!$post_interaction_row) {
 				// Insert a new row with click count as 1 if not exists
 				$wpdb->insert(
-					BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE,
+					WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE,
 					array(
 						'post_id'       => $post_id,
 						'click_count'   => 1,
@@ -112,7 +112,7 @@ class Search_Results_Page_Tracker {
 
 			// Now, update the click count and last_clicked timestamp
 			$wpdb->update(
-				BBM_SEARCH_METRICS_POST_INTERACTIONS_TABLE,
+				WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE,
 				array(
 					'click_count'   => $post_interaction_row ? $post_interaction_row->click_count + 1 : 1,
 					'last_clicked'  => $current_datetime,
@@ -127,7 +127,7 @@ class Search_Results_Page_Tracker {
 
 		// Insert search interaction data into the interactions table
 		$search_interaction_inserted = $wpdb->insert(
-			BBM_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE,
+			WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE,
 			array(
 				'query_id' => $search_query_id,
 				'post_id' => $post_id,
