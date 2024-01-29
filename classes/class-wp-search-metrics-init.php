@@ -62,7 +62,7 @@ class WP_Search_Metrics_Init {
         wp_enqueue_script('wp-search-metrics-js', plugins_url('src/js/wp-search-metrics.js', dirname(__FILE__)), array('jquery'), '1.0', true);
 
         // Localize the script with server-side data
-        wp_localize_script('wp-search-metrics-js', 'WPSearchMetrics', array(
+        wp_localize_script('wp-search-metrics-js', 'wpSearchMetrics', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce'    => wp_create_nonce('wp_search_metrics_nonce'),
         ));

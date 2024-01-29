@@ -45,7 +45,10 @@ class Ajax_Search_Tracker {
 		// Check if query already exists in the queries table
 		$query_id = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
+				"SELECT id
+				FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
+				WHERE query_text = %s
+				LIMIT 1",
 				$search_query
 			)
 		);
@@ -62,7 +65,10 @@ class Ajax_Search_Tracker {
 			// Increment query count if it already exists
 			$wpdb->query(
 				$wpdb->prepare(
-					"UPDATE " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " SET query_count = query_count + 1, last_searched = NOW() WHERE id = %d",
+					"UPDATE " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
+					SET query_count = query_count + 1,
+					last_searched = NOW()
+					WHERE id = %d",
 					$query_id
 				)
 			);
@@ -71,7 +77,10 @@ class Ajax_Search_Tracker {
 		// Check if post interaction already exists in the post_interactions table
 		$post_interaction_exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " WHERE post_id = %d LIMIT 1",
+				"SELECT id
+				FROM " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . "
+				WHERE post_id = %d
+				LIMIT 1",
 				$post_id
 			)
 		);
@@ -87,7 +96,10 @@ class Ajax_Search_Tracker {
 			// Increment click count if it already exists
 			$wpdb->query(
 				$wpdb->prepare(
-					"UPDATE " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " SET click_count = click_count + 1, last_clicked = NOW() WHERE post_id = %d",
+					"UPDATE " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . "
+					SET click_count = click_count + 1,
+					last_clicked = NOW()
+					WHERE post_id = %d",
 					$post_id
 				)
 			);
@@ -120,7 +132,10 @@ class Ajax_Search_Tracker {
 		// Check if query already exists in the queries table
 		$query_id = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
+				"SELECT id
+				FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
+				WHERE query_text = %s
+				LIMIT 1",
 				$search_query
 			)
 		);
