@@ -502,28 +502,40 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                             <tbody class="divide-y divide-gray-200 bg-white">
                                                                 <?php
                                                                     if (!empty($search_terms_clicks_results)) {
-                                                                        $previous_query_text = null;
+                                                                        // prepare rowspan values
+                                                                        $rowspanCounts = [];
                                                                         foreach ($search_terms_clicks_results as $result) {
-                                                                            // Get the post title and URL for user-friendly display
+                                                                            if (!isset($rowspanCounts[$result->query_text])) {
+                                                                                $rowspanCounts[$result->query_text] = 1;
+                                                                            } else {
+                                                                                $rowspanCounts[$result->query_text]++;
+                                                                            }
+                                                                        }
+
+                                                                        $outputRowspans = [];  // Track already outputted rowspans to skip them later
+                                                                        $previous_query_text = null;  // Keep track of the previous query text for comparison
+                                                                        foreach ($search_terms_clicks_results as $result) {
                                                                             $post_title = get_the_title($result->post_id);
                                                                             $post_url = get_permalink($result->post_id);
-
+                                                                        
                                                                             echo '<tr>';
-
-                                                                            // Only display the query text if it's different from the last iteration
-                                                                            if ($result->query_text !== $previous_query_text) {
-                                                                                echo '<td class="whitespace-nowrap pl-0 pr-2 text-sm text-gray-500">' . esc_html($result->query_text) . '</td>';
-                                                                                $previous_query_text = $result->query_text;
-                                                                            } else {
-                                                                                // For repeated search term, omit the first cell
-                                                                                echo '<td></td>';
+                                                                        
+                                                                            // Only output query_text td if it has not been outputted before or it's the first occurrence
+                                                                            if (!isset($outputRowspans[$result->query_text])) {
+                                                                                // Store and mark this query_text as outputted with its rowspan
+                                                                                $outputRowspans[$result->query_text] = true;
+                                                                                $rowspan = $rowspanCounts[$result->query_text];
+                                                                                echo '<td rowspan="' . $rowspan . '" class="whitespace-nowrap pl-0 pr-2 text-sm text-gray-500">'. esc_html($result->query_text) . '</td>';
                                                                             }
-
+                                                                            // Note: No else part needed since we don't render the cell if it's not the first occurrence
+                                                                        
                                                                             // Display the clickable post title and click count
                                                                             echo '<td class="whitespace-nowrap py-2 pl-2 pr-2 text-sm text-gray-500"><a class="transition hover:text-indigo-500" href="' . esc_url($post_url) . '" target="_blank">' . esc_html($post_title) . '</a></td>';
                                                                             echo '<td class="whitespace-nowrap px-2 pl-2 pr-0 text-sm font-medium text-gray-900 text-right">' . intval($result->clicks_count) . '</td>';
-
+                                                                        
                                                                             echo '</tr>';
+                                                                        
+                                                                            $previous_query_text = $result->query_text;
                                                                         }
                                                                     } else { 
                                                                 ?>
