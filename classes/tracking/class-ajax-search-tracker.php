@@ -134,6 +134,8 @@ class Ajax_Search_Tracker {
 		// check security of nonce
 		check_ajax_referer('wp_search_metrics_nonce', 'nonce');  // Security check
 
+		$current_datetime = current_time('mysql', 1);
+
 		// Extract and sanitize the data from the AJAX request
 		$search_query  = sanitize_text_field($_POST['search_query']);
 		$event_type  = sanitize_text_field($_POST['event_type']);

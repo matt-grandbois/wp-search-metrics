@@ -404,7 +404,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                                         <!-- Display Post Title as a Clickable Link -->
                                                                         <td class="whitespace-nowrap py-2 pl-0 pr-2 text-sm text-gray-500">
                                                                             <?php if ($post_title && $post_url): ?>
-                                                                                <a class="transition underline hover:text-indigo-600" href="<?php echo esc_url($post_url); ?>" target="_blank" rel="noopener noreferrer">
+                                                                                <a class="transition hover:text-indigo-600" href="<?php echo esc_url($post_url); ?>" target="_blank" rel="noopener noreferrer">
                                                                                     <?php echo esc_html($post_title); ?>
                                                                                 </a>
                                                                             <?php else: ?>
@@ -529,7 +529,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                                             // Note: No else part needed since we don't render the cell if it's not the first occurrence
                                                                         
                                                                             // Display the clickable post title and click count
-                                                                            echo '<td class="whitespace-nowrap py-2 pl-2 pr-2 text-sm text-gray-500"><a class="transition underline hover:text-indigo-600" href="' . esc_url($post_url) . '" target="_blank">' . esc_html($post_title) . '</a></td>';
+                                                                            echo '<td class="whitespace-nowrap py-2 pl-2 pr-2 text-sm text-gray-500"><a class="transition hover:text-indigo-600" href="' . esc_url($post_url) . '" target="_blank">' . esc_html($post_title) . '</a></td>';
                                                                             echo '<td class="whitespace-nowrap px-2 pl-2 pr-0 text-sm font-medium text-gray-900 text-right">' . intval($result->clicks_count) . '</td>';
                                                                         
                                                                             echo '</tr>';

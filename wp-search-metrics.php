@@ -3,7 +3,7 @@
  * Plugin Name: WP Search Metrics
  * Plugin URI:  https://wpsearchmetrics.com/
  * Description: Delivers highly valuable metrics showcasing how your visitors use your search engine.
- * Version:     0.2.3
+ * Version:     0.2.4
  * Author:      Matt Grandbois
  * Author URI:  https://mattgrandbois.com/
  */
