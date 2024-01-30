@@ -20,30 +20,39 @@ if (!defined('ABSPATH')) {
 function wpsm_get_top_clicked_pages_within_date_range($start_date, $end_date, $num_results = 8, $sort_order = 'DESC') {
     global $wpdb;
 
-    // Sanitize input dates to enhance security and prevent potential SQL injection.
-    $start_date_sanitized = sanitize_text_field($start_date);
-    $end_date_sanitized = sanitize_text_field($end_date);
+    // Retrieve the WordPress timezone setting.
+    $wp_timezone = new DateTimeZone(get_option('timezone_string') ? get_option('timezone_string') : 'UTC');
+    
+    // Define UTC timezone for conversion.
+    $utc_timezone = new DateTimeZone('UTC');
 
-    // Validate and sanitize the number of results, ensuring it's an integer and defaulting to 8 if not valid.
+    // Convert start and end dates to DateTime objects in WordPress timezone.
+    $start_datetime = new DateTime($start_date, $wp_timezone);
+    $end_datetime = new DateTime($end_date . ' 23:59:59', $wp_timezone);
+
+    // Determine the offset in seconds between WordPress timezone and UTC.
+    $offset = $wp_timezone->getOffset($start_datetime) - $utc_timezone->getOffset($start_datetime);
+    // Convert the offset to hours to adjust the query range.
+    $offsetHours = $offset / 3600;
+
+    // Validate and sanitize the number of results.
     $num_results_sanitized = filter_var($num_results, FILTER_VALIDATE_INT, ['options' => ['default' => 8, 'min_range' => 1]]);
 
-    // Validate and sanitize sort order, defaulting to DESC if not valid.
+    // Validate and sanitize sort order.
     $sort_order_sanitized = in_array(strtoupper($sort_order), ['ASC', 'DESC']) ? strtoupper($sort_order) : 'DESC';
 
-    // Adjust the end date to include results up to the end of the day.
-    $end_date_adjusted = date('Y-m-d', strtotime($end_date_sanitized . ' +1 day'));
-
-    // Prepare the SQL statement using sanitized inputs and a safe sort order.
-    $top_pages_clicked_sql = $wpdb->prepare("
-        SELECT si.post_id, COUNT(si.id) AS interaction_count
+    // Prepare the SQL statement, adjusting the date range by the timezone offset.
+    $top_pages_clicked_sql = $wpdb->prepare(
+        "SELECT si.post_id, COUNT(si.id) AS interaction_count
         FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " si
-        WHERE si.interaction_time >= %s
-        AND si.interaction_time < %s
-        AND si.interaction_type = 'conversion'
+        WHERE si.interaction_type = 'conversion' AND si.interaction_time >= DATE_ADD(%s, INTERVAL %d HOUR)
+        AND si.interaction_time < DATE_ADD(%s, INTERVAL %d HOUR)
         GROUP BY si.post_id
         ORDER BY interaction_count {$sort_order_sanitized}
         LIMIT %d",
-        $start_date_sanitized, $end_date_adjusted, $num_results_sanitized
+        $start_datetime->format('Y-m-d H:i:s'), $offsetHours,
+        $end_datetime->format('Y-m-d H:i:s'), $offsetHours,
+        $num_results_sanitized
     );
 
     // Execute the query and return the results.

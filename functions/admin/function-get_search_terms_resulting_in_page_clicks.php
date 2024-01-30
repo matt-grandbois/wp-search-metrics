@@ -22,19 +22,28 @@ if (!defined('ABSPATH')) {
 function wpsm_get_search_terms_resulting_in_page_clicks($start_date, $end_date, $num_results = 8, $query_sort_order = 'ASC', $clicks_sort_order = 'DESC') {
     global $wpdb;
 
-    // Sanitize and validate input parameters.
-    $start_date_sanitized = sanitize_text_field($start_date);
-    $end_date_sanitized = sanitize_text_field($end_date);
+    // Fetch WordPress's timezone setting.
+    $wp_timezone = new DateTimeZone(get_option('timezone_string') ? get_option('timezone_string') : 'UTC');
+    
+    // Define the UTC timezone for conversion.
+    $utc_timezone = new DateTimeZone('UTC');
+
+    // Convert start and end date strings to DateTime objects in WordPress timezone.
+    $start_datetime = new DateTime($start_date, $wp_timezone);
+    $end_datetime = new DateTime($end_date . ' 23:59:59', $wp_timezone); // Adjust to catch the full end day
+    
+    // Calculate the offset from WordPress timezone to UTC.
+    $offset = $wp_timezone->getOffset($start_datetime) - $utc_timezone->getOffset($start_datetime);
+    $offsetHours = $offset / 3600; // Convert the offset to hours
+
+    // Sanitize and validate the number of results.
     $num_results_sanitized = intval($num_results);
 
-    // Validate and sanitize sort orders.
+    // Ensure sort orders are valid, default if not.
     $query_sort_order_sanitized = in_array(strtoupper($query_sort_order), ['ASC', 'DESC']) ? strtoupper($query_sort_order) : 'ASC';
     $clicks_sort_order_sanitized = in_array(strtoupper($clicks_sort_order), ['ASC', 'DESC']) ? strtoupper($clicks_sort_order) : 'DESC';
 
-    // Adjust the end date to include interactions up to the end of the day.
-    $end_date_adjusted = date('Y-m-d', strtotime($end_date_sanitized . ' +1 day'));
-
-    // Construct the SQL query with safe placeholders and input values.
+    // Prepare the SQL with timezone-adjusted dates.
     $sql = $wpdb->prepare("
         SELECT
             sq.query_text,
@@ -46,15 +55,17 @@ function wpsm_get_search_terms_resulting_in_page_clicks($start_date, $end_date, 
             " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " si 
             ON sq.id = si.query_id
         WHERE 
-            si.interaction_time >= %s 
-            AND si.interaction_time < %s 
+            si.interaction_time >= DATE_ADD(%s, INTERVAL %d HOUR)
+            AND si.interaction_time < DATE_ADD(%s, INTERVAL %d HOUR)
             AND si.interaction_type = 'conversion'
         GROUP BY 
             sq.query_text, si.post_id
         ORDER BY 
             sq.query_text $query_sort_order_sanitized, clicks_count $clicks_sort_order_sanitized
         LIMIT %d",
-        $start_date_sanitized, $end_date_adjusted, $num_results_sanitized
+        $start_datetime->format('Y-m-d H:i:s'), $offsetHours,
+        $end_datetime->format('Y-m-d H:i:s'), $offsetHours,
+        $num_results_sanitized
     );
 
     // Execute the query and return the results.

@@ -186,7 +186,6 @@ class WP_Search_Metrics_Admin_Dashboard {
             echo '</span>';
         }
 
-
         /**
          * Fetch the top search queries and set them to $top_searches_queries
          */
@@ -293,13 +292,13 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                                 <th scope="col" class="whitespace-nowrap py-2 pl-0 pr-2 text-left text-sm font-semibold text-gray-900">Search Term</th>
                                                                 <th scope="col" class="whitespace-nowrap py-2 pl-2 pr-0 text-left text-sm text-right font-semibold text-gray-900">
                                                                     <a href="#" class="group inline-flex">
-                                                                    Volume
-                                                                    <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
-                                                                    <span class="ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
-                                                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                                                                        </svg>
-                                                                    </span>
+                                                                        <span class="transition group-hover:text-indigo-600">Volume</span>
+                                                                        <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
+                                                                        <span class="transition ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
+                                                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                                                            </svg>
+                                                                        </span>
                                                                     </a>
                                                                 </th>
                                                                 </tr>
@@ -354,7 +353,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                                         </div>
                                     </dt>
                                     <dd class="mt-8">
-                                        <canvas id="weeklyTopSearchesVolume"></canvas>                            
+                                        <canvas data-chart-js-id="searchTermsVolumes"></canvas>                            
                                     </dd>
                                 </div>
                             </div>
@@ -379,16 +378,16 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                 <table class="min-w-full divide-y divide-gray-300">
                                                     <thead>
                                                         <tr>
-                                                        <th scope="col" class="whitespace-nowrap py-2 pl-0 pr-2 text-left text-sm font-semibold text-gray-900">Search Term</th>
+                                                        <th scope="col" class="whitespace-nowrap py-2 pl-0 pr-2 text-left text-sm font-semibold text-gray-900">Page</th>
                                                         <th scope="col" class="whitespace-nowrap py-2 pl-2 pr-0 text-left text-sm text-right font-semibold text-gray-900">
                                                             <a href="#" class="group inline-flex">
-                                                            Volume
-                                                            <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
-                                                            <span class="ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
-                                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                                                                </svg>
-                                                            </span>
+                                                                <span class="transition group-hover:text-indigo-600">Total Clicks</span>
+                                                                <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
+                                                                <span class="transition ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
+                                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                </span>
                                                             </a>
                                                         </th>
                                                         </tr>
@@ -405,7 +404,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                                         <!-- Display Post Title as a Clickable Link -->
                                                                         <td class="whitespace-nowrap py-2 pl-0 pr-2 text-sm text-gray-500">
                                                                             <?php if ($post_title && $post_url): ?>
-                                                                                <a class="transition hover:text-indigo-500" href="<?php echo esc_url($post_url); ?>" target="_blank" rel="noopener noreferrer">
+                                                                                <a class="transition underline hover:text-indigo-600" href="<?php echo esc_url($post_url); ?>" target="_blank" rel="noopener noreferrer">
                                                                                     <?php echo esc_html($post_title); ?>
                                                                                 </a>
                                                                             <?php else: ?>
@@ -437,7 +436,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                                         </div>                            
                                     </dd>
                                     <?php
-                                        if (!empty($top_searches_queries)) {
+                                        if (!empty($top_clicked_pages)) {
                                     ?>
                                         <button type="button" class="flex flex-row items-center gap-1 rounded transition mt-8 bg-gray-100 px-2 py-1 text-sm font-semibold text-gray-600 shadow-sm hover:bg-gray-200">
                                             <span>View All</span>
@@ -488,13 +487,13 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                                     <th scope="col" class="whitespace-nowrap py-2 pl-2 pr-2 text-left text-sm font-semibold text-gray-900">Destination Page</th>
                                                                     <th scope="col" class="whitespace-nowrap py-2 pl-2 pr-0 text-left text-sm text-right font-semibold text-gray-900">
                                                                         <a href="#" class="group inline-flex">
-                                                                        Total Clicks
-                                                                        <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
-                                                                        <span class="ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
-                                                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                                                                            </svg>
-                                                                        </span>
+                                                                            <span class="transition group-hover:text-indigo-600">Total Clicks</span>
+                                                                            <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
+                                                                            <span class="transition ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
+                                                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                                                                </svg>
+                                                                            </span>
                                                                         </a>
                                                                     </th>
                                                                 </tr>
@@ -530,7 +529,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                                             // Note: No else part needed since we don't render the cell if it's not the first occurrence
                                                                         
                                                                             // Display the clickable post title and click count
-                                                                            echo '<td class="whitespace-nowrap py-2 pl-2 pr-2 text-sm text-gray-500"><a class="transition hover:text-indigo-500" href="' . esc_url($post_url) . '" target="_blank">' . esc_html($post_title) . '</a></td>';
+                                                                            echo '<td class="whitespace-nowrap py-2 pl-2 pr-2 text-sm text-gray-500"><a class="transition underline hover:text-indigo-600" href="' . esc_url($post_url) . '" target="_blank">' . esc_html($post_title) . '</a></td>';
                                                                             echo '<td class="whitespace-nowrap px-2 pl-2 pr-0 text-sm font-medium text-gray-900 text-right">' . intval($result->clicks_count) . '</td>';
                                                                         
                                                                             echo '</tr>';
@@ -572,7 +571,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                                         <div class="sm:flex sm:items-center">
                                         <div class="sm:flex-auto">
                                             <h2 class="text-base font-semibold leading-6 text-gray-900">Non-Converting Search Terms</h2>
-                                            <p class="mt-2 text-sm text-gray-500">Search queries that returned no results or did not result in a click.</p>
+                                            <p class="mt-2 text-sm text-gray-500">Search terms resulting in a page bounce.</p>
                                         </div>
                                         </div>
                                     </dt>
@@ -587,13 +586,13 @@ class WP_Search_Metrics_Admin_Dashboard {
                                                         <th scope="col" class="whitespace-nowrap py-2 pl-0 pr-2 text-left text-sm font-semibold text-gray-900">Search Term</th>
                                                         <th scope="col" class="whitespace-nowrap py-2 pl-2 pr-0 text-left text-sm text-right font-semibold text-gray-900">
                                                             <a href="#" class="group inline-flex">
-                                                            Volume
-                                                            <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
-                                                            <span class="ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
-                                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                                                                </svg>
-                                                            </span>
+                                                                <span class="transition group-hover:text-indigo-600">Volume</span>
+                                                                <!-- Active: "bg-gray-200 text-gray-900 group-hover:bg-gray-300", Not Active: "invisible text-gray-400 group-hover:visible group-focus:visible" -->
+                                                                <span class="transition ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200">
+                                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                </span>
                                                             </a>
                                                         </th>
                                                         </tr>
@@ -672,20 +671,20 @@ class WP_Search_Metrics_Admin_Dashboard {
 				'1.0',
 				'all'
 			);
-
-            wp_enqueue_script(
-                'wp-search-metrics-dashboard-js',
-                plugins_url('/src/js/admin/dashboard.js', dirname(dirname(__FILE__))),
-                array(),
-                '1.0',
-                true // In footer
-            );
 			
             wp_enqueue_script(
                 'wp-search-metrics-chartjs',
                 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
                 array(),
                 '4.4.1',
+                true // In footer
+            );
+
+            wp_enqueue_script(
+                'wp-search-metrics-dashboard-js',
+                plugins_url('/src/js/admin/dashboard.js', dirname(dirname(__FILE__))),
+                array('wp-search-metrics-chartjs'),
+                '1.0',
                 true // In footer
             );
 
@@ -697,79 +696,103 @@ class WP_Search_Metrics_Admin_Dashboard {
                 global $wpdb;
                 // Use WordPress function to get the current time in the configured timezone
                 $now = current_time('mysql', 1); // 'mysql' format is Y-m-d H:i:s
-                $today = date('Y-m-d'); // Use just the date part for daily calculations
+                $today = current_time('Y-m-d', 1); // Use just the date part for daily calculations
 
                 // Initialize $date_ranges
                 $date_ranges = [];
 
+                $wp_timezone = new DateTimeZone(get_option('timezone_string') ?: 'UTC'); // Fetch WP timezone, fallback to UTC if not set
+
                 if ($date_range === '1') {
-                    // Fetches the current time, rounding down to the nearest hour
-                    $current_time = current_time('mysql', 1);
-                
                     for ($i = 0; $i < 4; $i++) {
-                        // Calculate the end time of each interval; it starts with the current time for the first interval
-                        $end = date('Y-m-d H:i:s', strtotime("-" . ($i * 6) . " hours", strtotime($current_time)));
-                        // Calculate the start time by subtracting 6 hours from the end time of each interval
-                        $start = date('Y-m-d H:i:s', strtotime("-6 hours", strtotime($end)));
+                        // Create a DateTime object from $now and subtract hours in a loop.
+                        $endDateTime = new DateTime($now, $wp_timezone);
+                        $endDateTime->modify("-" . ($i * 6) . " hours"); // Calculate the end time of each interval.
+                        $end = $endDateTime->format('Y-m-d H:i:s');
+                
+                        $startDateTime = clone $endDateTime; // Clone to make sure we're not just referencing the same object
+                        $startDateTime->modify("-6 hours"); // Calculate the start time by subtracting 6 hours
+                        $start = $startDateTime->format('Y-m-d H:i:s');
                 
                         // Prepend the times to the beginning of the array to reverse the order (so the most recent times are at the end)
                         array_unshift($date_ranges, ['start' => $start, 'end' => $end]);
                     }
-                
-                    // The loop reverses the order, but if you want to ensure the most recent is first, you might not need to reverse the order. If needed, reverse again.
-                    // $date_ranges = array_reverse($date_ranges); // Uncomment if reversal needed based on loop adjustment
-                } else if ($date_range === '7') {
-                    // Last 7 days
+                }
+                else if ($date_range === '7') {
+                    // Last 7 days                    
                     for ($i = 6; $i >= 0; $i--) {
-                        $start = date('Y-m-d 00:00:00', strtotime("-" . ($i) . " days", strtotime($today)));
-                        // Adjust the 'end' to be the start of the next day
-                        $end = date('Y-m-d 00:00:00', strtotime("-" . ($i - 1) . " days", strtotime($today)));
-                        if ($i == 0) $end =  $now; // Till now for the current day
+                        // Use DateTime with the WordPress-configured timezone to calculate the start and end of each day
+                        $startDateTime = new DateTime($today, $wp_timezone);
+                        $startDateTime->modify("-" . ($i + 1) . " day")
+                                      ->setTime(0, 0, 0); // Set to start of the day
+                        $start = $startDateTime->format('Y-m-d H:i:s');
+                        
+                        // Make use of cloning to ensure $endDateTime is a separate instance
+                        $endDateTime = clone $startDateTime;
+                        if ($i == 0) {
+                            // For the current day, use $now as the end time
+                            $end = current_time('mysql', 1); // Ensuring it uses WordPress's timezone setting
+                        } else {
+                            // Otherwise, set to the start of the next day before the adjustment
+                            $endDateTime->modify("+1 day");
+                            $end = $endDateTime->format('Y-m-d H:i:s');
+                        }
+                        
                         $date_ranges[] = [
                             'start' => $start,
                             'end'   => $end,
                         ];
                     }
                 }
-                else if ($date_range === '28') { // Last 28 days
-                    $date_ranges = [
-                        [
-                            'start' => date('Y-m-d', strtotime("-27 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("-21 days", strtotime($today))),
-                        ],
-                        [
-                            'start' => date('Y-m-d', strtotime("-20 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("-14 days", strtotime($today))),
-                        ],
-                        [
-                            'start' => date('Y-m-d', strtotime("-13 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("-7 days", strtotime($today))),
-                        ],
-                        [
-                            'start' => date('Y-m-d', strtotime("-6 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("+1 day", strtotime($today))),
-                        ],
+                else if ($date_range === '28') { // Last 28 days                
+                    // Start with today's date and time in the WordPress-configured timezone
+                    $todayDateTime = new DateTime('now', $wp_timezone);
+                    $todayDateTime->setTime(0,0); // Reset time to 00:00:00 for consistent day start
+                
+                    $date_ranges = [];
+                    $periods = [
+                        ['-27 days', '-21 days'],
+                        ['-20 days', '-14 days'],
+                        ['-13 days', '-7 days'],
+                        ['-6 days', 'now'], // To include the current day up to the current time
                     ];
+                
+                    foreach ($periods as $range) {
+                        // Create DateTime objects for each period start and end, then format and store
+                        $startDateTime = (clone $todayDateTime)->modify($range[0])->format('Y-m-d H:i:s');
+                        $endDateTime = ($range[1] === 'now') ? current_time('mysql', 1) : (clone $todayDateTime)->modify($range[1].' +1 day')->format('Y-m-d H:i:s');
+                        // '-6 days' + 'now' adjusted to reference current date dynamically, correcting range
+                        
+                        $date_ranges[] = [
+                            'start' => $startDateTime,
+                            'end'   => $endDateTime,
+                        ];
+                    }
                 }
                 else { // default to 28 days
-                    $date_ranges = [
-                        [
-                            'start' => date('Y-m-d', strtotime("-27 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("-21 days", strtotime($today))),
-                        ],
-                        [
-                            'start' => date('Y-m-d', strtotime("-20 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("-14 days", strtotime($today))),
-                        ],
-                        [
-                            'start' => date('Y-m-d', strtotime("-13 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("-7 days", strtotime($today))),
-                        ],
-                        [
-                            'start' => date('Y-m-d', strtotime("-6 days", strtotime($today))),
-                            'end' => date('Y-m-d', strtotime("+1 day", strtotime($today))),
-                        ],
+                    // Start with today's date and time in the WordPress-configured timezone
+                    $todayDateTime = new DateTime('now', $wp_timezone);
+                    $todayDateTime->setTime(0,0); // Reset time to 00:00:00 for consistent day start
+                
+                    $date_ranges = [];
+                    $periods = [
+                        ['-27 days', '-21 days'],
+                        ['-20 days', '-14 days'],
+                        ['-13 days', '-7 days'],
+                        ['-6 days', 'now'], // To include the current day up to the current time
                     ];
+                
+                    foreach ($periods as $range) {
+                        // Create DateTime objects for each period start and end, then format and store
+                        $startDateTime = (clone $todayDateTime)->modify($range[0])->format('Y-m-d H:i:s');
+                        $endDateTime = ($range[1] === 'now') ? current_time('mysql', 1) : (clone $todayDateTime)->modify($range[1].' +1 day')->format('Y-m-d H:i:s');
+                        // '-6 days' + 'now' adjusted to reference current date dynamically, correcting range
+                        
+                        $date_ranges[] = [
+                            'start' => $startDateTime,
+                            'end'   => $endDateTime,
+                        ];
+                    }
                 }
             
                 // Dynamically construct the SQL SELECT clause parts for date ranges
@@ -778,9 +801,7 @@ class WP_Search_Metrics_Admin_Dashboard {
                     // Notice: Adjusted alias generation to handle different formats
                     $start_alias = esc_sql($range['start']);
                     $end_alias = esc_sql($range['end']);
-                    $label = ($date_range === '1')
-                    ? date('M j ' . get_option('time_format'), strtotime($start_alias)) . '-' . date(get_option('time_format'), strtotime($end_alias))
-                    : date('M j', strtotime($start_alias)) . '-' . date('M j', strtotime($end_alias));
+                    $label = ($date_range === '1') ? date('M j ' . get_option('time_format'), strtotime($start_alias)) . '-' . date('M j ' . get_option('time_format'), strtotime($end_alias)) : date('M j', strtotime($start_alias)) . '-' . date('M j', strtotime($end_alias));
                     $date_range_columns[] = "COUNT(CASE WHEN si.interaction_time BETWEEN %s AND %s THEN 1 ELSE NULL END) AS '{$label}'";
                 }
 
@@ -921,28 +942,12 @@ class WP_Search_Metrics_Admin_Dashboard {
                 $colorIndex++;  // Increment color index for the next dataset
             }
             $processed_data['labels'] = $labels;
-        
-            wp_localize_script('wp-search-metrics-chartjs', 'ChartData', ['data' => $processed_data]);
 
-			$inline_script = "
-			document.addEventListener('DOMContentLoaded', function() {
-                var weeklyTopSearchesVolumeCtx = document.getElementById('weeklyTopSearchesVolume').getContext('2d');
-                var weeklyTopSearchesVolume = new Chart(weeklyTopSearchesVolumeCtx, {
-                    type: 'line',
-                    data: ChartData.data,
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                            },
-                        },
-                    },
-                });
-            });
-			";
-
-			wp_add_inline_script('wp-search-metrics-chartjs', $inline_script);
+            wp_localize_script('wp-search-metrics-dashboard-js', 'wpSearchMetricsDashboard', array(
+                'searchTermsVolumeData' => array(
+                    'data' => $processed_data
+                ),
+            ));
 
         }
     }

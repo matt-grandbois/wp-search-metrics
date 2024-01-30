@@ -20,32 +20,40 @@ if (!defined('ABSPATH')) {
 function wpsm_get_top_non_converting_search_terms_within_date_range($start_date, $end_date, $num_results = 8, $sort_order = 'DESC') {
     global $wpdb;
 
-    // Sanitize input dates to enhance security and prevent potential SQL injection.
-    $start_date_sanitized = sanitize_text_field($start_date);
-    $end_date_sanitized = sanitize_text_field($end_date);
+    // Retrieve the WordPress timezone setting.
+    $wp_timezone = new DateTimeZone(get_option('timezone_string') ? get_option('timezone_string') : 'UTC');
+    
+    // Define the UTC timezone for conversion purposes.
+    $utc_timezone = new DateTimeZone('UTC');
 
-    // Validate and sanitize the requested number of results.
+    // Convert start and end dates to DateTime objects respecting the WordPress timezone.
+    $start_datetime = new DateTime($start_date, $wp_timezone);
+    $end_datetime = new DateTime($end_date . ' 23:59:59', $wp_timezone); // Including the full day
+
+    // Calculate the offset in seconds from the WordPress timezone to UTC.
+    $offset = $wp_timezone->getOffset($start_datetime) - $utc_timezone->getOffset($start_datetime);
+    $offsetHours = $offset / 3600; // Convert offset to hours
+
+    // Validate and sanitize the number of results and sort order.
     $num_results_sanitized = filter_var($num_results, FILTER_VALIDATE_INT, ['options' => ['default' => 8, 'min_range' => 1]]);
-
-    // Validate and sanitize the sort order.
     $sort_order_sanitized = in_array(strtoupper($sort_order), ['ASC', 'DESC']) ? strtoupper($sort_order) : 'DESC';
 
-    // Adjust the end date to include results up to the end of the day.
-    $end_date_adjusted = date('Y-m-d', strtotime($end_date_sanitized . ' +1 day'));
-
-    // Construct the SQL statement using safe practices.
+    // Prepare the SQL query, factoring in the timezone offset for accurate local-time-based querying.
     $prepared_sql = $wpdb->prepare(
         "SELECT sq.query_text, COUNT(si.id) AS search_count
         FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " sq
         JOIN " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " si ON sq.id = si.query_id
-        WHERE si.interaction_time >= %s AND si.interaction_time < %s 
+        WHERE si.interaction_time >= DATE_ADD(%s, INTERVAL %d HOUR) 
+        AND si.interaction_time < DATE_ADD(%s, INTERVAL %d HOUR)
         AND si.interaction_type = 'no_conversion'
         GROUP BY sq.query_text
         ORDER BY search_count $sort_order_sanitized
         LIMIT %d",
-        $start_date_sanitized, $end_date_adjusted, $num_results_sanitized
+        $start_datetime->format('Y-m-d H:i:s'), $offsetHours,
+        $end_datetime->format('Y-m-d H:i:s'), $offsetHours,
+        $num_results_sanitized
     );
 
-    // Execute the query and return the results.
+    // Execute the query and gather the results.
     return $wpdb->get_results($prepared_sql);
 }

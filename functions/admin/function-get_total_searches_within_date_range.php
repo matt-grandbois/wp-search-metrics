@@ -18,23 +18,34 @@ if (!defined('ABSPATH')) {
 function wpsm_get_total_searches_within_date_range($start_date, $end_date) {
     global $wpdb;
 
-    // Sanitize input dates to avoid injection.
-    $start_date_sanitized = sanitize_text_field($start_date);
-    $end_date_sanitized = sanitize_text_field($end_date);
+    // Fetch WordPress's timezone setting.
+    $wp_timezone = new DateTimeZone(get_option('timezone_string') ? get_option('timezone_string') : 'UTC');
+    
+    // Fetch the UTC timezone.
+    $utc_timezone = new DateTimeZone('UTC');
 
-    // Adjust the end date to include searches up to the end of the day.
-    $end_date_adjusted = date('Y-m-d', strtotime($end_date_sanitized . ' +1 day'));
+    // Convert start date to DateTime object in WP timezone.
+    $start_datetime = new DateTime($start_date, $wp_timezone);
+    // Convert end date to DateTime object in WP timezone, adjust to end of the day.
+    $end_datetime = new DateTime($end_date . ' 23:59:59', $wp_timezone);
 
-    // Prepare SQL statement to prevent SQL injection. 
+    // Determine the offset in seconds between WP timezone and UTC.
+    $offset = $wp_timezone->getOffset($start_datetime) - $utc_timezone->getOffset($start_datetime);
+    // Convert offset to hours to adjust the query range.
+    $offsetHours = $offset / 3600;
+
+    // Prepare the query, adjusting the date range by the calculated offset.
     $prepared_sql = $wpdb->prepare(
-        "SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " WHERE interaction_time >= %s AND interaction_time < %s",
-        $start_date_sanitized, 
-        $end_date_adjusted
+        "SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . "
+        WHERE interaction_time >= DATE_ADD(%s, INTERVAL %d HOUR) AND interaction_time <= DATE_ADD(%s, INTERVAL %d HOUR)",
+        $start_datetime->format('Y-m-d H:i:s'), // Start date in WP timezone.
+        $offsetHours, // Adjust start date by offset hours.
+        $end_datetime->format('Y-m-d H:i:s'), // End date just before midnight, in WP timezone.
+        $offsetHours // Adjust end date by offset hours.
     );
 
-    // Execute the query and return the result.
+    // Execute the query.
     $total_searches = $wpdb->get_var($prepared_sql);
 
-    // Ensure the result is an integer before returning.
     return (int) $total_searches;
 }

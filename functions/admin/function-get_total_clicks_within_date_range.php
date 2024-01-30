@@ -18,21 +18,34 @@ if (!defined('ABSPATH')) {
 function wpsm_get_total_clicks_within_date_range($start_date, $end_date) {
     global $wpdb;
 
-    // Sanitize input dates to enhance security and prevent SQL injection.
-    $start_date_sanitized = sanitize_text_field($start_date);
-    $end_date_sanitized = sanitize_text_field($end_date);
+    // Retrieve the WordPress timezone setting.
+    $wp_timezone = new DateTimeZone(get_option('timezone_string') ? get_option('timezone_string') : 'UTC');
+    
+    // Fetch the UTC timezone.
+    $utc_timezone = new DateTimeZone('UTC');
 
-    // Adjust the end date to ensure it includes searches up to the end of the day.
-    $end_date_adjusted = date('Y-m-d', strtotime($end_date_sanitized . ' +1 day'));
+    // Convert start date to DateTime object in WordPress timezone.
+    $start_datetime = new DateTime($start_date, $wp_timezone);
+    // Adjust end date to include the entire day in WordPress timezone, then convert to DateTime object.
+    $end_datetime = new DateTime($end_date . ' 23:59:59', $wp_timezone);
 
-    // Use $wpdb->prepare to prepare SQL statement safely with sanitized inputs.
+    // Determine the offset in seconds between WordPress timezone and UTC.
+    $offset = $wp_timezone->getOffset($start_datetime) - $utc_timezone->getOffset($start_datetime);
+    // Convert offset to hours to adjust the query range.
+    $offsetHours = $offset / 3600;
+
+    // Prepare the query, adjusting the date range by the calculated offset.
+    // Note the use of DATE_ADD() function to adjust start and end times by the offset hours.
     $prepared_sql = $wpdb->prepare(
-        "SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " WHERE interaction_type='conversion' AND interaction_time >= %s AND interaction_time < %s",
-        $start_date_sanitized,
-        $end_date_adjusted
+        "SELECT COUNT(*) FROM " . WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE . " 
+        WHERE interaction_type = 'conversion' AND interaction_time >= DATE_ADD(%s, INTERVAL %d HOUR) AND interaction_time <= DATE_ADD(%s, INTERVAL %d HOUR)",
+        $start_datetime->format('Y-m-d H:i:s'), // Start date and time in WP timezone.
+        $offsetHours, // Adjust start date by offset hours.
+        $end_datetime->format('Y-m-d H:i:s'), // End date and time at the end of the day in WP timezone.
+        $offsetHours // Adjust end date by offset hours.
     );
 
-    // Execute the query and return the result as an integer.
+    // Execute the query.
     $total_clicks = $wpdb->get_var($prepared_sql);
 
     return (int) $total_clicks;
