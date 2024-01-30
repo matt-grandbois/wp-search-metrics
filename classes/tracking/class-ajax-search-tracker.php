@@ -37,6 +37,8 @@ class Ajax_Search_Tracker {
 		// check security of nonce
 		check_ajax_referer('wp_search_metrics_nonce', 'nonce');  // Security check
 
+		$current_datetime = current_time('mysql', 1);
+
 		// Extract and sanitize the data from the AJAX request
 		$search_query  = sanitize_text_field($_POST['search_query']);
 		$post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
@@ -57,8 +59,11 @@ class Ajax_Search_Tracker {
 			// Insert new search query if it does not exist
 			$wpdb->insert(
 				WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
-				array('query_text' => $search_query, 'query_count' => 1),
-				array('%s', '%d')
+				array(
+					'query_text' => $search_query,
+					'query_count' => 1,
+					'last_searched' => $current_datetime
+				), array('%s', '%d', '%s')
 			);
 			$query_id = $wpdb->insert_id;
 		} else {
@@ -67,7 +72,7 @@ class Ajax_Search_Tracker {
 				$wpdb->prepare(
 					"UPDATE " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
 					SET query_count = query_count + 1,
-					last_searched = NOW()
+					last_searched = " . $current_datetime . "
 					WHERE id = %d",
 					$query_id
 				)
@@ -89,8 +94,11 @@ class Ajax_Search_Tracker {
 			// Insert new post interaction if it does not exist
 			$wpdb->insert(
 				WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE,
-				array('post_id' => $post_id, 'click_count' => 1),
-				array('%d', '%d')
+				array(
+					'post_id' => $post_id,
+					'click_count' => 1,
+					'last_clicked' => $current_datetime
+				), array('%d', '%d', '%s')
 			);
 		} else {
 			// Increment click count if it already exists
@@ -98,7 +106,7 @@ class Ajax_Search_Tracker {
 				$wpdb->prepare(
 					"UPDATE " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . "
 					SET click_count = click_count + 1,
-					last_clicked = NOW()
+					last_clicked = " . $current_datetime . "
 					WHERE post_id = %d",
 					$post_id
 				)
@@ -111,9 +119,10 @@ class Ajax_Search_Tracker {
 			array(
 				'query_id' => $query_id,
 				'post_id' => $post_id,
-				'interaction_type' => $event_type
+				'interaction_type' => $event_type,
+				'interaction_time' => $current_datetime
 			),
-			array('%d', '%d', '%s')
+			array('%d', '%d', '%s', '%s')
 		);
 
 		// Send a JSON success response with a message
@@ -144,8 +153,11 @@ class Ajax_Search_Tracker {
 			// Insert new search query if it does not exist
 			$wpdb->insert(
 				WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE,
-				array('query_text' => $search_query, 'query_count' => 1),
-				array('%s', '%d')
+				array(
+					'query_text' => $search_query,
+					'query_count' => 1,
+					'last_searched' => $current_datetime
+				), array('%s', '%d', '%s')
 			);
 			$query_id = $wpdb->insert_id;
 		} else {
@@ -153,7 +165,7 @@ class Ajax_Search_Tracker {
 			$wpdb->query(
 				$wpdb->prepare(
 					"UPDATE " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "
-					 SET query_count = query_count + 1, last_searched = NOW()
+					 SET query_count = query_count + 1, last_searched = " . $current_datetime . "
 					 WHERE id = %d",
 					$query_id
 				)
@@ -165,11 +177,11 @@ class Ajax_Search_Tracker {
 			WP_SEARCH_METRICS_SEARCH_INTERACTIONS_TABLE,
 			array(
 				'query_id' => $query_id,
-				// Making sure to use `null` to signify no post was clicked
 				'post_id' => null,
-				'interaction_type' => $event_type
+				'interaction_type' => $event_type,
+				'interaction_time' => $current_datetime
 			),
-			array('%d', '%d', '%s') // Defining null `post_id` as `%d` will insert it correctly as NULL
+			array('%d', '%d', '%s', '%s')
 		);
 
 		// Send a JSON success response with a message

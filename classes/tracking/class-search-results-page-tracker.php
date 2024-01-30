@@ -49,7 +49,7 @@ class Search_Results_Page_Tracker {
 	public function log_search_interaction() {
 		global $wpdb;
 		// Current UTC time in MySQL datetime format
-		$current_datetime = gmdate('Y-m-d H:i:s');
+		$current_datetime = current_time('mysql', 1);
 
 		// Perform the security check
 		check_ajax_referer('wp_search_metrics_results_page_nonce', 'nonce');
@@ -62,7 +62,10 @@ class Search_Results_Page_Tracker {
 		// First, check if search query exists and get its ID
 		$search_query_id = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . " WHERE query_text = %s LIMIT 1",
+				"SELECT id
+				FROM " . WP_SEARCH_METRICS_SEARCH_QUERIES_TABLE . "W
+				HERE query_text = %s
+				LIMIT 1",
 				$search_query
 			)
 		);
@@ -92,7 +95,9 @@ class Search_Results_Page_Tracker {
 		if ($event_type === 'conversion') {
 			$post_interaction_row = $wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT * FROM " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . " WHERE post_id = %d",
+					"SELECT *
+					FROM " . WP_SEARCH_METRICS_POST_INTERACTIONS_TABLE . "
+					WHERE post_id = %d",
 					$post_id
 				)
 			);
